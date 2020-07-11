@@ -1,3 +1,5 @@
-pub fn calculate(_expr: &str) -> f64 {
-  0.0
+pub mod lexer;
+
+pub fn calculate(expr: &str) -> Vec<lexer::Token> {
+  lexer::lex(expr.to_string()).unwrap()
 }

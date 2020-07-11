@@ -33,7 +33,7 @@ impl Repl {
         }
 
         let result = calculate(input_text.trim());
-        println!("{}", result);
+        println!("{:?}", result);
     }
   }
 }
