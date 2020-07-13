@@ -32,8 +32,9 @@ impl Repl {
                 break;
             }
 
-            let result = calculate(input_text.trim());
-            println!("{:?}", result);
+            if let Some(result) = calculate(input_text.trim()) {
+                println!("{:?}", result);
+            }
         }
     }
 }

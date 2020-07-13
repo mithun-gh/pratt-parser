@@ -19,6 +19,18 @@ pub enum ParserError {
     InvalidToken(Token),
 }
 
-pub fn parse(_tokens: Vec<Token>) -> Result<Expression, ParserError> {
-    Ok(Expression::Number(0.0))
+pub fn parse(tokens: Vec<Token>) -> Result<Option<Expression>, ParserError> {
+    let mut expr = None;
+    let mut tokens = tokens.iter().peekable();
+
+    while let Some(token) = tokens.next() {
+        match token {
+            Token::Number(n) => {
+                expr = Some(Expression::Number(*n));
+            }
+            _ => {}
+        }
+    }
+
+    Ok(expr)
 }
