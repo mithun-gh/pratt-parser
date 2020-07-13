@@ -8,6 +8,18 @@ pub enum Operator {
     Div,
 }
 
+impl Operator {
+    #[allow(dead_code)]
+    fn lbp(&self) -> i32 {
+        match self {
+            Operator::Add => 10,
+            Operator::Sub => 10,
+            Operator::Mul => 20,
+            Operator::Div => 20,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Expression {
     Number(f64),
