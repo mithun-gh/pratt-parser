@@ -1,4 +1,6 @@
 use crate::evaluator::lexer::Token;
+use std::iter::Peekable;
+use std::slice::Iter;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Operator {
@@ -26,8 +28,31 @@ pub enum Expression {
     Binary(Box<Expression>, Operator, Box<Expression>),
 }
 
+#[derive(Debug, Clone)]
+pub enum Partial {
+    Operator(Operator),
+    Expression(Expression),
+}
+
+impl Partial {
+    fn to_number(&self) -> Result<Expression, ParserError> {
+        match self {
+            Partial::Expression(number_expr) => Ok(number_expr.clone()),
+            _ => Err(ParserError::UnexpectedError),
+        }
+    }
+
+    fn to_operator(&self) -> Result<Operator, ParserError> {
+        match self {
+            Partial::Operator(operator) => Ok(*operator),
+            _ => Err(ParserError::UnexpectedError),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum ParserError {
+    UnexpectedError,
     InvalidToken(Token),
     UnexpectedEndOfInput,
 }
@@ -59,6 +84,54 @@ pub fn parse(tokens: Vec<Token>) -> Result<Option<Expression>, ParserError> {
     }
 
     Ok(expr)
+}
+
+// 2
+// 2 + 3 * 4
+// 2 * 3 + 4
+// 2, +, (3 * 4)
+// (2 * 3), +, 4
+fn parse_expr(tokens: &mut Peekable<Iter<'_, Token>>) -> Result<Option<Expression>, ParserError> {
+    let mut stack = Vec::<Partial>::new();
+
+    while let Some(&token) = tokens.next() {
+        match token {
+            Token::Number(n) => {
+                if let Some(_) = tokens.peek() {
+                    let op = match_operator(*tokens.next().unwrap())?;
+
+                    if let Some(Partial::Operator(prev_op)) = stack.last() {
+                        if op.lbp() > prev_op.lbp() {
+                            if let Some(Token::Number(n2)) = tokens.next() {
+                                let left = Box::new(Expression::Number(n));
+                                let right = Box::new(Expression::Number(*n2));
+                                stack.push(Partial::Expression(Expression::Binary(left, op, right)));
+                            } else {
+                                return Err(ParserError::UnexpectedEndOfInput);
+                            }
+                        } else {
+                            let op = stack.pop().unwrap().to_operator()?;
+                            let left = Box::new(stack.pop().unwrap().to_number()?);
+                            let right = Box::new(Expression::Number(n));
+                            stack.push(Partial::Expression(Expression::Binary(left, op, right)));
+                            stack.push(Partial::Operator(op));
+                        }
+                    } else {
+                        stack.push(Partial::Expression(Expression::Number(n)));
+                        stack.push(Partial::Operator(op));
+                    }
+
+                } else {
+                    stack.push(Partial::Expression(Expression::Number(n)));
+                }
+            }
+            Token::Punctuator(_) => {
+                stack.push(Partial::Operator(match_operator(token)?));
+            }
+        }
+    }
+
+    Err(ParserError::UnexpectedEndOfInput)
 }
 
 fn match_operator(token: Token) -> Result<Operator, ParserError> {
