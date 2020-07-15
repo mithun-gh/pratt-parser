@@ -1,5 +1,11 @@
 use crate::evaluator::lexer::Token;
 
+#[derive(Debug, Clone)]
+pub enum Expression {
+    Number(f64),
+    Binary(Box<Expression>, Operator, Box<Expression>),
+}
+
 #[derive(Debug, Copy, Clone)]
 pub enum Operator {
     Add,
@@ -19,34 +25,6 @@ impl Operator {
     }
 }
 
-#[derive(Debug, Clone)]
-pub enum Expression {
-    Number(f64),
-    Binary(Box<Expression>, Operator, Box<Expression>),
-}
-
-#[derive(Debug, Clone)]
-pub enum Partial {
-    Operator(Operator),
-    Expression(Expression),
-}
-
-impl Partial {
-    pub fn to_number(&self) -> Result<Expression, ParserError> {
-        match self {
-            Partial::Expression(number_expr) => Ok(number_expr.clone()),
-            _ => Err(ParserError::UnexpectedError),
-        }
-    }
-
-    pub fn to_operator(&self) -> Result<Operator, ParserError> {
-        match self {
-            Partial::Operator(operator) => Ok(*operator),
-            _ => Err(ParserError::UnexpectedError),
-        }
-    }
-}
-
 impl Token {
     pub fn to_operator(&self) -> Result<Operator, ParserError> {
         match self {
@@ -57,6 +35,21 @@ impl Token {
             _ => Err(ParserError::InvalidToken(*self)),
         }
     }
+
+    pub fn nud(&self) -> Result<Expression, ParserError> {
+        match self {
+            Token::Number(n) => Ok(Expression::Number(*n)),
+            _ => Err(ParserError::UnexpectedError)
+        }
+    }
+
+    pub fn led(&self, left: Expression, op: Operator) -> Result<Expression, ParserError> {
+        if let Some(right) = parse_expr()? {
+            return Ok(Expression::Binary(Box::new(left), op, Box::new(right)));
+        } else {
+            return Err(ParserError::UnexpectedError);
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -64,6 +57,10 @@ pub enum ParserError {
     UnexpectedError,
     InvalidToken(Token),
     UnexpectedEndOfInput,
+}
+
+pub fn parse_expr() -> Result<Option<Expression>, ParserError> {
+    Ok(None)
 }
 
 pub fn parse(_tokens: Vec<Token>) -> Result<Option<Expression>, ParserError> {
