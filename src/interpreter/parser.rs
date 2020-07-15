@@ -17,13 +17,13 @@ pub enum Operator {
 }
 
 impl Token {
-    pub fn bp(&self) -> i32 {
+    pub fn bp(&self) -> Result<i32, ParserError> {
         match self {
-            Token::Punctuator('+') => 1,
-            Token::Punctuator('-') => 1,
-            Token::Punctuator('*') => 2,
-            Token::Punctuator('/') => 2,
-            _ => 0,
+            Token::Punctuator('+') => Ok(1),
+            Token::Punctuator('-') => Ok(1),
+            Token::Punctuator('*') => Ok(2),
+            Token::Punctuator('/') => Ok(2),
+            _ => Err(ParserError::UnexpectedError),
         }
     }
 
@@ -64,7 +64,7 @@ impl<'a> Parser<'a> {
     }
 
     pub fn led(&mut self, left: Expression, op: Token) -> Result<Expression, ParserError> {
-        if let Some(right) = self.parse_expr(op.bp())? {
+        if let Some(right) = self.parse_expr(op.bp()?)? {
             Ok(Expression::Binary(
                 Box::new(left),
                 op.to_operator()?,
@@ -84,7 +84,7 @@ impl<'a> Parser<'a> {
             let mut left = self.nud(curr)?;
 
             while let Some(&&next) = self.tokens.peek() {
-                if next.bp() <= prev_bp {
+                if next.bp()? <= prev_bp {
                     break;
                 }
                 self.tokens.next();
