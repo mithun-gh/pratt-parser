@@ -93,11 +93,3 @@ impl<'a> Parser<'a> {
         Ok(None)
     }
 }
-
-pub fn parse_expr() -> Result<Option<Expression>, ParserError> {
-    Ok(None)
-}
-
-pub fn parse(_tokens: Vec<Token>) -> Result<Option<Expression>, ParserError> {
-    Ok(None)
-}
