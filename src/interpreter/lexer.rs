@@ -29,7 +29,7 @@ pub fn lex(code: String) -> Result<Vec<Token>, LexerError> {
                 let number: f64 = number.parse().unwrap();
                 tokens.push(Token::Number(number));
             }
-            '+' | '-' | '*' | '/' | '(' | ')' => {
+            '+' | '-' | '*' | '/' | '%' | '^' | '(' | ')' => {
                 let ch = code.next().unwrap();
                 tokens.push(Token::Punctuator(ch));
             }

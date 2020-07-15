@@ -14,6 +14,8 @@ pub enum Operator {
     Sub,
     Mul,
     Div,
+    Mod,
+    Exp,
 }
 
 impl Token {
@@ -23,6 +25,8 @@ impl Token {
             Token::Punctuator('-') => Ok(1),
             Token::Punctuator('*') => Ok(2),
             Token::Punctuator('/') => Ok(2),
+            Token::Punctuator('%') => Ok(2),
+            Token::Punctuator('^') => Ok(3),
             _ => Err(ParserError::UnexpectedError),
         }
     }
@@ -33,6 +37,8 @@ impl Token {
             Token::Punctuator('-') => Ok(Operator::Sub),
             Token::Punctuator('*') => Ok(Operator::Mul),
             Token::Punctuator('/') => Ok(Operator::Div),
+            Token::Punctuator('%') => Ok(Operator::Mod),
+            Token::Punctuator('^') => Ok(Operator::Exp),
             _ => Err(ParserError::InvalidToken(*self)),
         }
     }

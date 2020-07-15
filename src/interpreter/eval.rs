@@ -7,6 +7,8 @@ impl Operator {
             Operator::Sub => left - right,
             Operator::Mul => left * right,
             Operator::Div => left / right,
+            Operator::Mod => left % right,
+            Operator::Exp => left.powf(right),
         }
     }
 }
