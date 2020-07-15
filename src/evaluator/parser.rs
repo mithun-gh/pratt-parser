@@ -63,24 +63,28 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn led(&mut self, left: Expression, op: Operator) -> Result<Expression, ParserError> {
-        if let Some(right) = self.parse()? {
-            return Ok(Expression::Binary(Box::new(left), op, Box::new(right)));
+    pub fn led(&mut self, left: Expression, op: Token) -> Result<Expression, ParserError> {
+        if let Some(right) = self.parse_expr(op.bp())? {
+            return Ok(Expression::Binary(Box::new(left), op.to_operator()?, Box::new(right)));
         } else {
             return Err(ParserError::UnexpectedError);
         }
     }
 
     pub fn parse(&mut self) -> Result<Option<Expression>, ParserError> {
+        self.parse_expr(0)
+    }
+
+    fn parse_expr(&mut self, prev_bp: i32) -> Result<Option<Expression>, ParserError> {
         if let Some(&curr) = self.tokens.next() {
             let mut left = self.nud(curr)?;
 
             while let Some(&&next) = self.tokens.peek() {
-                if next.bp() < curr.bp() {
+                if next.bp() < prev_bp {
                     break;
                 }
                 self.tokens.next();
-                left = self.led(left, next.to_operator()?)?;
+                left = self.led(left, next)?;
             }
 
             return Ok(Some(left));
