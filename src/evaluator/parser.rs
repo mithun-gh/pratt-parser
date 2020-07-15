@@ -14,25 +14,14 @@ pub enum Operator {
     Div,
 }
 
-impl Operator {
-    pub fn lbp(&self) -> i32 {
-        match self {
-            Operator::Add => 10,
-            Operator::Sub => 10,
-            Operator::Mul => 20,
-            Operator::Div => 20,
-        }
-    }
-}
-
 impl Token {
-    pub fn to_operator(&self) -> Result<Operator, ParserError> {
+    pub fn bp(&self) -> i32 {
         match self {
-            Token::Punctuator('+') => Ok(Operator::Add),
-            Token::Punctuator('-') => Ok(Operator::Sub),
-            Token::Punctuator('*') => Ok(Operator::Mul),
-            Token::Punctuator('/') => Ok(Operator::Div),
-            _ => Err(ParserError::InvalidToken(*self)),
+            Token::Punctuator('+') => 10,
+            Token::Punctuator('-') => 10,
+            Token::Punctuator('*') => 20,
+            Token::Punctuator('/') => 20,
+            _ => 0,
         }
     }
 
@@ -48,6 +37,16 @@ impl Token {
             return Ok(Expression::Binary(Box::new(left), op, Box::new(right)));
         } else {
             return Err(ParserError::UnexpectedError);
+        }
+    }
+
+    pub fn to_operator(&self) -> Result<Operator, ParserError> {
+        match self {
+            Token::Punctuator('+') => Ok(Operator::Add),
+            Token::Punctuator('-') => Ok(Operator::Sub),
+            Token::Punctuator('*') => Ok(Operator::Mul),
+            Token::Punctuator('/') => Ok(Operator::Div),
+            _ => Err(ParserError::InvalidToken(*self)),
         }
     }
 }
