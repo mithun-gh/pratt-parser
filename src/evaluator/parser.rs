@@ -9,8 +9,7 @@ pub enum Operator {
 }
 
 impl Operator {
-    #[allow(dead_code)]
-    fn lbp(&self) -> i32 {
+    pub fn lbp(&self) -> i32 {
         match self {
             Operator::Add => 10,
             Operator::Sub => 10,
