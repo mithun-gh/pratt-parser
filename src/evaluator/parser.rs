@@ -19,10 +19,10 @@ pub enum Operator {
 impl Token {
     pub fn bp(&self) -> i32 {
         match self {
-            Token::Punctuator('+') => 10,
-            Token::Punctuator('-') => 10,
-            Token::Punctuator('*') => 20,
-            Token::Punctuator('/') => 20,
+            Token::Punctuator('+') => 1,
+            Token::Punctuator('-') => 1,
+            Token::Punctuator('*') => 2,
+            Token::Punctuator('/') => 2,
             _ => 0,
         }
     }
@@ -71,12 +71,6 @@ impl<'a> Parser<'a> {
         }
     }
 
-    // function expr(rbp = 0) {
-    //     let left = nud(next())
-    //     while (bp(peek()) > rbp)
-    //         left = led(left, next())
-    //     return left
-    // }
     pub fn parse(&mut self) -> Result<Option<Expression>, ParserError> {
         if let Some(&curr) = self.tokens.next() {
             let mut left = self.nud(curr)?;
