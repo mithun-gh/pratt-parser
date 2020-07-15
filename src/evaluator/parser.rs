@@ -1,6 +1,6 @@
-use std::slice::Iter;
-use std::iter::Peekable;
 use crate::evaluator::lexer::Token;
+use std::iter::Peekable;
+use std::slice::Iter;
 
 #[derive(Debug, Clone)]
 pub enum Expression {
@@ -51,7 +51,9 @@ pub struct Parser<'a> {
 
 impl<'a> Parser<'a> {
     pub fn new(tokens: Iter<'a, Token>) -> Self {
-        Parser { tokens: tokens.peekable() }
+        Parser {
+            tokens: tokens.peekable(),
+        }
     }
 
     pub fn nud(&self, token: Token) -> Result<Expression, ParserError> {
