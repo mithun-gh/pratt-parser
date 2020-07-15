@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use crate::evaluator::calculate;
+use crate::interpreter::calculate;
 
 pub struct Repl {
     pub version: &'static str,

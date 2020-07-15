@@ -1,4 +1,4 @@
-use crate::evaluator::lexer::Token;
+use crate::interpreter::lexer::Token;
 use std::iter::Peekable;
 use std::slice::Iter;
 
