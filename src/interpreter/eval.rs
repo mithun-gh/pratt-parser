@@ -21,8 +21,6 @@ pub enum ArithmaticError {
 pub fn evaluate(expr: Expression) -> Result<f64, ArithmaticError> {
     match expr {
         Expression::Number(n) => Ok(n),
-        Expression::Binary(left, op, right) => {
-            Ok(op.eval(evaluate(*left)?, evaluate(*right)?))
-        }
+        Expression::Binary(left, op, right) => Ok(op.eval(evaluate(*left)?, evaluate(*right)?)),
     }
 }

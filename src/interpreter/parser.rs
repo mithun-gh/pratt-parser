@@ -70,7 +70,8 @@ impl<'a> Parser<'a> {
     }
 
     pub fn led(&mut self, left: Expression, op: Token) -> Result<Expression, ParserError> {
-        if let Some(right) = self.parse_expr(op.bp()?)? {
+        let bp = op.bp()? - if op == Token::Punctuator('^') { 1 } else { 0 };
+        if let Some(right) = self.parse_expr(bp)? {
             Ok(Expression::Binary(
                 Box::new(left),
                 op.to_operator()?,
