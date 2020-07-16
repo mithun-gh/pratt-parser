@@ -88,8 +88,17 @@ impl<'a> Parser<'a> {
 
     fn parse_expr(&mut self, prev_bp: i32) -> Result<Option<Expression>, ParserError> {
         if let Some(&curr) = self.tokens.next() {
-            let mut left = self.nud(curr)?;
+            let left = match curr {
+                Token::Punctuator('(') => self.parse_expr(0)?,
+                Token::Number(_) => Some(self.nud(curr)?),
+                _ => None,
+            };
 
+            if left.is_none() {
+                return Ok(None);
+            }
+
+            let mut left = left.unwrap();
             while let Some(&&next) = self.tokens.peek() {
                 if next.bp()? <= prev_bp {
                     break;
