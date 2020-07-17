@@ -27,7 +27,7 @@ impl Token {
             Token::Punctuator('/') => Ok(2),
             Token::Punctuator('%') => Ok(2),
             Token::Punctuator('^') => Ok(3),
-            Token::Punctuator(')') => Ok(4),
+            Token::Punctuator(')') => Ok(0),
             _ => Err(ParserError::UnexpectedError),
         }
     }
@@ -95,6 +95,10 @@ impl<'a> Parser<'a> {
                 _ => None,
             };
 
+            if curr == Token::Punctuator('(') /* && self.tokens.peek() == Some(&&Token::Punctuator(')')) */ {
+                self.tokens.next();
+            }
+
             if left.is_none() {
                 return Ok(None);
             }
@@ -105,9 +109,6 @@ impl<'a> Parser<'a> {
                     break;
                 }
                 self.tokens.next();
-                if next == Token::Punctuator(')') {
-                    break;
-                }
                 left = self.led(left, next)?;
             }
 
