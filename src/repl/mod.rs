@@ -33,7 +33,11 @@ impl Repl {
             }
 
             if let Some(result) = calculate(input_text.trim()) {
-                println!("{:?}", result);
+                if result.fract() > 0.0 {
+                    println!("{}", result);
+                } else {
+                    println!("{:.0}", result);
+                }
             }
         }
     }
