@@ -21,13 +21,13 @@ pub enum Operator {
 impl Token {
     pub fn bp(&self) -> Result<i32, ParserError> {
         match self {
+            Token::Punctuator(')') => Ok(0),
             Token::Punctuator('+') => Ok(1),
             Token::Punctuator('-') => Ok(1),
             Token::Punctuator('*') => Ok(2),
             Token::Punctuator('/') => Ok(2),
             Token::Punctuator('%') => Ok(2),
             Token::Punctuator('^') => Ok(3),
-            Token::Punctuator(')') => Ok(0),
             _ => Err(ParserError::UnexpectedError),
         }
     }
@@ -95,12 +95,13 @@ impl<'a> Parser<'a> {
                 _ => None,
             };
 
-            if curr == Token::Punctuator('(') /* && self.tokens.peek() == Some(&&Token::Punctuator(')')) */ {
-                self.tokens.next();
+            if left.is_none() {
+                return Err(ParserError::InvalidToken(curr));
             }
 
-            if left.is_none() {
-                return Ok(None);
+            // skip ')' if curr == '('
+            if curr == Token::Punctuator('(') {
+                self.tokens.next();
             }
 
             let mut left = left.unwrap();
