@@ -1,24 +1,22 @@
 use std::io::{self, Write};
+use termion::{clear, cursor/*, event::Key, input::TermRead*/};
 
 use crate::interpreter::calculate;
 
 pub struct Repl {
     pub version: &'static str,
-    pub lang_version: &'static str,
 }
 
 impl Repl {
     pub fn new() -> Self {
         Repl {
             version: "v0.1",
-            lang_version: "v0.1",
         }
     }
 
     pub fn run(&self) {
-        println!("Welcome to CalcScript!");
-        println!("Language: {} REPL: {}", self.lang_version, self.version);
-        println!("Type quit() or press CTRL + C to exit.\n");
+        println!("Welcome to CalcScript {}.", self.version);
+        println!("Type .quit or press CTRL+C to exit.\n");
 
         let mut input_text = String::new();
         loop {
@@ -28,17 +26,22 @@ impl Repl {
             input_text.clear();
             io::stdin().read_line(&mut input_text).expect("Stdin error");
 
-            if input_text.contains("quit()") {
-                break;
+            match input_text.trim() {
+                ".quit" | ".exit" => break,
+                ".clear" => println!("{}{}", clear::All, cursor::Goto(1, 1)),
+                _ => print_result(&input_text),
             }
 
-            if let Some(result) = calculate(input_text.trim()) {
-                if result.fract() != 0.0 {
-                    println!("{}", result);
-                } else {
-                    println!("{:.0}", result);
-                }
-            }
+        }
+    }
+}
+
+fn print_result(input_text: &str) {
+    if let Some(result) = calculate(input_text.trim()) {
+        if result.fract() != 0.0 {
+            println!("{}", result);
+        } else {
+            println!("{:.0}", result);
         }
     }
 }
