@@ -1,6 +1,4 @@
-use std::io::{self, Write};
-use termion::{clear, cursor/*, event::Key, input::TermRead*/};
-
+use rustyline::{Editor, KeyPress, Cmd, error::ReadlineError};
 use crate::interpreter::calculate;
 
 pub struct Repl {
@@ -16,23 +14,26 @@ impl Repl {
 
     pub fn run(&self) {
         println!("Welcome to CalcScript {}.", self.version);
-        println!("Type .quit or press CTRL+C to exit.\n");
+        println!("Type 'q' or press CTRL+C to exit.\n");
 
-        let mut input_text = String::new();
+        let mut rl = Editor::<()>::new();
+        rl.bind_sequence(KeyPress::Char('c'), Cmd::ClearScreen);
+        rl.bind_sequence(KeyPress::Char('q'), Cmd::Interrupt);
+
         loop {
-            print!("> ");
-            io::stdout().flush().expect("Stdout error");
-
-            input_text.clear();
-            io::stdin().read_line(&mut input_text).expect("Stdin error");
-
-            match input_text.trim() {
-                ".quit" | ".exit" => break,
-                ".clear" => println!("{}{}", clear::All, cursor::Goto(1, 1)),
-                _ => print_result(&input_text),
+            match rl.readline("> ") {
+                Ok(ref input_text) => {
+                    rl.add_history_entry(input_text);
+                    print_result(input_text);
+                },
+                Err(ReadlineError::Interrupted) => break,
+                Err(err) => {
+                    eprintln!("{:?}", err);
+                    break;
+                },
             }
-
         }
+
     }
 }
 
