@@ -14,7 +14,7 @@ impl Repl {
 
     pub fn run(&self) {
         println!("Welcome to CalcScript {}.", self.version);
-        println!("Type 'q' or press CTRL+C to exit.\n");
+        println!("Type 'q' to quit and 'c' to clear the screen.\n");
 
         let mut rl = Editor::<()>::new();
         rl.bind_sequence(KeyPress::Char('c'), Cmd::ClearScreen);
